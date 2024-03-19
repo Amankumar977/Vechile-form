@@ -2,32 +2,20 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Label, Button } from "../components/formComponents";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { setVehicleModel } from "../store/reducers/orderData";
 const VehicleModel = ({ page, setPage }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  let fourWheelerModel = [
-    "Volkswagen Golf",
-    "Ford Fiesta",
-    "Toyota Yaris",
-    "Hyundai i20",
-    "Mazda Mazda3",
-    "Chevrolet Spark",
-    "Fiat 500",
-    "Mini Cooper",
-  ];
-  let twoWheelerModel = [
-    "Harley-Davidson Softail",
-    "Indian Scout",
-    "Honda Rebel",
-    "Yamaha V Star",
-    "Suzuki Boulevard",
-    "Triumph Bonneville Bobber",
-    "Moto Guzzi California",
-    "Ducati XDiavel",
-  ];
+  const { vehicleData } = useSelector((state) => state.vehicleData);
+  const { vehicleType, vehicleModel } = useSelector((state) => state.orderData);
+  const selectedVehicleType = vehicleData.filter(
+    (vehicle) => vehicle.vehicleType === vehicleType
+  );
+  const dispatch = useDispatch();
   const handlePrevClick = () => {
     setPage(page - 1); // Decrement page number
   };
@@ -36,7 +24,7 @@ const VehicleModel = ({ page, setPage }) => {
     if (data.vehicleModel === "selectModel") {
       return toast.error("Please select vechile Model");
     }
-    console.log(data); // Logging form data
+    dispatch(setVehicleModel(data.vehicleModel));
     setPage(page + 1); // Increment page number
   };
   return (
@@ -53,12 +41,14 @@ const VehicleModel = ({ page, setPage }) => {
           {...register("vehicleModel", {
             required: "Please select the vechile type",
           })}
-          className="w-full text-xl bg-gray-300 rounded-md mt-3">
-          <option value="selectModel">Please select the vechile Model</option>
-          {twoWheelerModel &&
-            twoWheelerModel.map((vechileModel) => (
-              <option value={vechileModel} key={vechileModel}>
-                {vechileModel}
+          className="w-full text-xl bg-gray-300 rounded-md mt-3 px-2 py-1">
+          <option value={vehicleModel ? vehicleModel : "selectModel"}>
+            {vehicleModel ? vehicleModel : "Please select the vechile Model"}
+          </option>
+          {selectedVehicleType &&
+            selectedVehicleType.map((vehicle) => (
+              <option value={vehicle.vehicleName} key={vehicle.vehicleName}>
+                {vehicle.vehicleName}
               </option>
             ))}
         </select>

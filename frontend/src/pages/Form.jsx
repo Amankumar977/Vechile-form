@@ -40,7 +40,7 @@ const Form = () => {
 
   // Render the form
   return (
-    <div className="bg-gradient-to-r from-slate-100 via-blue-400 to-blue-500 w-full h-screen min-h-screen flex flex-col ">
+    <div className="bg-gradient-to-r from-blue-200 via-blue-500 to-blue-600 w-full h-screen min-h-screen flex flex-col ">
       {/* Logo */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md -mt-24 ">
         <img src={Logo} alt="Rentify Logo" />

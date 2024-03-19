@@ -2,69 +2,71 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Button, Label } from "../components/formComponents";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { setVehicleType } from "../store/reducers/orderData";
+
 const VehicleType = ({ page, setPage }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  let fourWheelerData = [
-    "Hatchback",
-    "Sedan",
-    "SUV",
-    "Coupe",
-    "Hybrid",
-    "Luxury Car",
-    "Sports Car",
-    "Van",
-    "Electric Vehicle",
-  ];
-  let twoWheelerData = [
-    "Cruiser",
-    "Sportbike",
-    "Adventure Bike",
-    "Dual-Sport Bike",
-    "Electric Motorcycle",
-    "Vintage Motorcycle",
-    "Supermoto",
+
+  // Retrieve data from Redux store
+  const { vehicleData } = useSelector((state) => state.vehicleData);
+  const { numberOfWheels, vehicleType } = useSelector(
+    (state) => state.orderData
+  );
+  const dispatch = useDispatch();
+  // Filter vehicleData based on the number of wheels
+  const filteredVehicleData = vehicleData.filter(
+    (vehicle) =>
+      (numberOfWheels === "2" && vehicle.wheelType === "TWO_WHEELER") ||
+      (numberOfWheels === "4" && vehicle.wheelType === "FOUR_WHEELER")
+  );
+
+  // Extract unique vehicle types
+  const uniqueVehicleTypes = [
+    ...new Set(filteredVehicleData.map((vehicle) => vehicle.vehicleType)),
   ];
   const handlePrevClick = () => {
     setPage(page - 1); // Decrement page number
   };
+
   // Function to handle form submission
   const onSubmit = (data) => {
-    if (data.vechileType === "selectVechile") {
-      return toast.error("Please select vechile type");
+    if (data.vehicleType === "selectVehicle") {
+      return toast.error("Please select vehicle type");
     }
-    console.log(data); // Logging form data
+    dispatch(setVehicleType(data.vehicleType));
     setPage(page + 1); // Increment page number
   };
-
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Label
-          htmlFor={"vechileType"}
-          label={"Vechile Type"}
+          htmlFor={"vehicleType"}
+          label={"Vehicle Type"}
           className={"text-2xl"}
         />
         <select
-          name="vechileType"
-          id="vechileType"
-          {...register("vechileType", {
-            required: "Please select the vechile type",
+          name="vehicleType"
+          id="vehicleType"
+          {...register("vehicleType", {
+            required: "Please select the vehicle type",
           })}
-          className="w-full text-xl bg-gray-300 rounded-md mt-3">
-          <option value="selectVechile">Please select the vechile Type</option>
-          {fourWheelerData &&
-            fourWheelerData.map((vechileType) => (
-              <option value={vechileType} key={vechileType}>
-                {vechileType}
-              </option>
-            ))}
+          className="w-full text-xl bg-gray-300 rounded-md mt-3 px-2 py-1">
+          <option value={vehicleType ? vehicleType : "selectVehicle"}>
+            {vehicleType ? vehicleType : "Please select the vehicle Type"}
+          </option>
+          {uniqueVehicleTypes.map((vehicleType) => (
+            <option value={vehicleType} key={vehicleType}>
+              {vehicleType}
+            </option>
+          ))}
         </select>
-        {errors.vechileType && (
-          <span className="text-red-500">{errors.vechileType.message}</span>
+        {errors.vehicleType && (
+          <span className="text-red-500">{errors.vehicleType.message}</span>
         )}
         {/* Navigation buttons */}
         <div className="gap-10 flex pt-8">

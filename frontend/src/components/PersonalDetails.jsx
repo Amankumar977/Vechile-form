@@ -1,7 +1,8 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { Input, Label, Button } from "./formComponents";
-
+import { useSelector, useDispatch } from "react-redux";
+import { setFirstName, setLastName } from "../store/reducers/orderData";
 const PersonalDetails = ({ page, setPage }) => {
   // Initialize useForm hook to manage form state and validation
   const {
@@ -9,9 +10,17 @@ const PersonalDetails = ({ page, setPage }) => {
     handleSubmit, // Function to handle form submission
     formState: { errors }, // Object to track form errors
   } = useForm();
+  const dispatch = useDispatch();
+  // Initialize useSelector hook for orderDetails
+  const orderData = useSelector((state) => state.orderData);
+
+  // Extract firstName and lastName from orderData
+  const { firstName, lastName } = orderData;
 
   // Function to handle form submission
   const onSubmit = (data) => {
+    dispatch(setFirstName(data.firstName));
+    dispatch(setLastName(data.lastName));
     setPage(page + 1); // Proceed to the next page
   };
 
@@ -23,17 +32,18 @@ const PersonalDetails = ({ page, setPage }) => {
           {/* Username input */}
           <Label
             className={"block text-sm font-medium text-gray-700 pb-2"}
-            label={"Username"}
-            htmlFor={"username"}
+            label={"firstName"}
+            htmlFor={"firstName"}
           />
           <Input
             type={"text"}
-            name={"username"}
-            id={"username"}
+            name={"firstName"}
+            id={"firstName"}
             autoComplete={"firstName"}
+            defaultValue={firstName} // Set defaultValue to display firstName
             className={"!text-xl"}
-            {...register("username", {
-              required: "Username is required",
+            {...register("firstName", {
+              required: "first Name is required",
               maxLength: {
                 value: 20,
                 message: "first Name cannot be more than 20 characters.",
@@ -41,7 +51,7 @@ const PersonalDetails = ({ page, setPage }) => {
             })} // Register username input with validation rules
           />
           {/* Display error message if username is required */}
-          {errors.username && (
+          {errors.firstName && (
             <span className="text-red-500">{errors.username.message}</span>
           )}
 
@@ -56,6 +66,7 @@ const PersonalDetails = ({ page, setPage }) => {
             name={"lastName"}
             id={"lastName"}
             autoComplete={"lastName"}
+            defaultValue={lastName}
             className={"!text-xl"}
             {...register("lastName", { required: "Last name is required" })} // Register last name input with validation rules
           />
@@ -74,10 +85,7 @@ const PersonalDetails = ({ page, setPage }) => {
               disable={page === 0}
             />
             {/* Next or Submit button, depending on the page */}
-            <Button
-              type={"submit"}
-              text={"Next"} // Change button text to "Submit" on the last page
-            />
+            <Button type={"submit"} text={"Next"} />
           </div>
         </div>
       </form>

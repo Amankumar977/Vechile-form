@@ -1,22 +1,29 @@
-import React from "react";
-import { Input, Button, Label, Radio } from "../components/formComponents"; // Importing necessary components
-import { useForm } from "react-hook-form"; // Importing useForm hook
+import React, { useEffect } from "react";
+import { Button, Label, Radio } from "../components/formComponents";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { setNumberOfWheels } from "../store/reducers/orderData";
 
 const NumberOfWheels = ({ page, setPage }) => {
-  // Destructuring useForm hook to manage form state and validation
+  // Destructure useForm hook to manage form state and validation
   const {
-    register, // Function to register inputs with React Hook Form
-    handleSubmit, // Function to handle form submission
-    formState: { errors }, // Object to track form errors
+    register,
+    handleSubmit,
+    formState: { errors },
   } = useForm();
 
+  // Select the numberOfWheels value from the Redux store
+  const orderData = useSelector((state) => state.orderData);
+  const { numberOfWheels } = orderData;
+  // Initialize useDispatch hook to dispatch actions to the Redux store
+  const dispatch = useDispatch();
   // Function to handle click on the 'Prev' button
   const handlePrevClick = () => {
     setPage(page - 1); // Decrement page number
   };
   // Function to handle form submission
   const onSubmit = (data) => {
-    console.log(data); // Logging form data
+    dispatch(setNumberOfWheels(data.numberOfWheels)); // Dispatch action to set numberOfWheels in Redux store
     setPage(page + 1); // Increment page number
   };
 
@@ -25,13 +32,14 @@ const NumberOfWheels = ({ page, setPage }) => {
       <div className="space-y-6">
         {/* Form element */}
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/** Wheels options */}
+          {/* Radio buttons for selecting the number of wheels */}
           <div className="flex gap-4 items-center text-2xl mb-4">
             {/* Radio button for 2 Wheeler */}
             <Radio
               id={"twoWheels"}
               name={"numberOfWheels"}
-              value={"2"} // Value attribute for 2 Wheeler option
+              value={"2"}
+              defaultChecked={numberOfWheels === "2"} // Check if numberOfWheels is 2
               {...register("numberOfWheels", {
                 required: "Please select the wheels type", // Validation for required selection
               })}
@@ -43,7 +51,8 @@ const NumberOfWheels = ({ page, setPage }) => {
             <Radio
               id={"fourWheels"}
               name={"numberOfWheels"}
-              value={"4"} // Value attribute for 4 Wheeler option
+              value={"4"}
+              defaultChecked={numberOfWheels === "4"} // Check if numberOfWheels is 4
               {...register("numberOfWheels", {
                 required: "Please select the wheels type", // Validation for required selection
               })}
