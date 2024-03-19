@@ -2,16 +2,20 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Input, Label, Button } from "./formComponents";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
-
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import { setStartDate, setEndDate } from "../store/reducers/orderData";
 const DatePicker = ({ page, setPage }) => {
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
   const { vehicleData } = useSelector((state) => state.vehicleData);
-  const { vehicleModel, endDate } = useSelector((state) => state.orderData);
+  const orderData = useSelector((state) => state.orderData);
+  const { vehicleModel, endDate } = orderData;
   const selectedVehicle = vehicleData.find(
     (vehicle) => vehicle.vehicleName === vehicleModel
   );
@@ -19,12 +23,32 @@ const DatePicker = ({ page, setPage }) => {
   const startDate = endDate ? new Date(selectedVehicle.endDate) : date;
   const minEndDate = new Date(startDate);
   minEndDate.setDate(minEndDate.getDate() + 1);
-  const onSubmit = (data) => {
-    console.log(data); // You can handle the selected dates here
-    setPage(0); // Move to the next page after selecting the dates
-    toast.success(`Your Booking is successfull for ${vehicleModel}`);
+  const onSubmit = async (data) => {
+    try {
+      dispatch(setEndDate(data.endDate));
+      dispatch(setStartDate(data.startDate));
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/order/updateVehicleDate`,
+        {
+          id: selectedVehicle._id,
+          startDate: data.startDate,
+          endDate: data.endDate,
+        }
+      );
+      let finalOrder = { ...orderData, vehicleId: selectedVehicle._id };
+      const orderResponse = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/order/createOrder`,
+        { finalOrder }
+      );
+      localStorage.setItem("orderData", JSON.stringify({}));
+      toast.success(`Your Booking is successful for ${vehicleModel}`);
+      setPage(0); // Move to the next page after selecting the dates
+      reset(); // Reset the form fields
+    } catch (error) {
+      console.error("Error in updating the vehicle Time", error);
+      toast.error("Error in creating the order. Please try again later.");
+    }
   };
-
   const handlePrevClick = () => {
     setPage(page - 1);
   };
