@@ -1,10 +1,17 @@
-import NumberOfWheels from "./NumberOfWheels";
+// Import the required MongoClient from the 'mongodb' package
+import { MongoClient } from "mongodb";
 
-import DatePicker from "./DatePicker";
-import PersonalDetails from "./PersonalDetails";
-import VehicleModel from "./VehicleModel";
-import VehicleType from "./VehicleType";
-let vechileData = [
+// Get the MongoDB connection URI from the environment variables
+const uri = process.env.MONGO_URL;
+
+// Define the name of the database
+const dbName = "Rentify";
+
+// Define the name of the collection where the data will be stored
+const collectionName = "vehicles";
+
+// Define an array of vehicle data objects to be inserted into the database
+let vehicleData = [
   {
     vehicleName: "Mercedes-Benz C-Class",
     vehicleType: "SEDAN",
@@ -429,228 +436,37 @@ let vechileData = [
     startDate: "",
     endDate: "",
   },
-  {
-    vehicleName: "Honda Activa",
-    vehicleType: "SCOOTER",
-    vehicleModel: "Activa",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Suzuki Access",
-    vehicleType: "SCOOTER",
-    vehicleModel: "Access",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "TVS Jupiter",
-    vehicleType: "SCOOTER",
-    vehicleModel: "Jupiter",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Hero Splendor",
-    vehicleType: "MOTORCYCLE",
-    vehicleModel: "Splendor",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Bajaj Pulsar",
-    vehicleType: "MOTORCYCLE",
-    vehicleModel: "Pulsar",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Royal Enfield Classic",
-    vehicleType: "MOTORCYCLE",
-    vehicleModel: "Classic",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Yamaha FZ",
-    vehicleType: "MOTORCYCLE",
-    vehicleModel: "FZ",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "KTM Duke",
-    vehicleType: "MOTORCYCLE",
-    vehicleModel: "Duke",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Honda CB Shine",
-    vehicleType: "MOTORCYCLE",
-    vehicleModel: "CB Shine",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Hero HF Deluxe",
-    vehicleType: "MOTORCYCLE",
-    vehicleModel: "HF Deluxe",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "TVS Apache",
-    vehicleType: "MOTORCYCLE",
-    vehicleModel: "Apache",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Bajaj Platina",
-    vehicleType: "MOTORCYCLE",
-    vehicleModel: "Platina",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Suzuki Hayabusa",
-    vehicleType: "SPORTS_BIKE",
-    vehicleModel: "Hayabusa",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Kawasaki Ninja",
-    vehicleType: "SPORTS_BIKE",
-    vehicleModel: "Ninja",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Ducati Panigale",
-    vehicleType: "SPORTS_BIKE",
-    vehicleModel: "Panigale",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "BMW S1000RR",
-    vehicleType: "SPORTS_BIKE",
-    vehicleModel: "S1000RR",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Harley-Davidson Street",
-    vehicleType: "CRUISER",
-    vehicleModel: "Street",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Indian Scout",
-    vehicleType: "CRUISER",
-    vehicleModel: "Scout",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Triumph Bonneville",
-    vehicleType: "CRUISER",
-    vehicleModel: "Bonneville",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Victory Octane",
-    vehicleType: "CRUISER",
-    vehicleModel: "Octane",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Moto Guzzi V7",
-    vehicleType: "CRUISER",
-    vehicleModel: "V7",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Ducati Diavel",
-    vehicleType: "CRUISER",
-    vehicleModel: "Diavel",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Aprilia Tuono",
-    vehicleType: "SPORTS_TOURER",
-    vehicleModel: "Tuono",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "KTM Super Duke",
-    vehicleType: "SPORTS_TOURER",
-    vehicleModel: "Super Duke",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "BMW R1250GS",
-    vehicleType: "ADVENTURE",
-    vehicleModel: "R1250GS",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Honda Africa Twin",
-    vehicleType: "ADVENTURE",
-    vehicleModel: "Africa Twin",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
-  {
-    vehicleName: "Kawasaki Versys",
-    vehicleType: "ADVENTURE",
-    vehicleModel: "Africa Twin",
-    wheelType: "TWO_WHEELER",
-    startDate: "",
-    endDate: "",
-  },
 ];
 
-export {
-  NumberOfWheels,
-  DatePicker,
-  PersonalDetails,
-  VehicleModel,
-  VehicleType,
-};
+// Define an asynchronous function to seed the data into the database
+async function seedData() {
+  // Create a new MongoClient instance with the connection URI and options
+  const client = new MongoClient(uri);
+
+  try {
+    // Attempt to establish a connection to the MongoDB database
+    await client.connect();
+    console.log("MongoDB Connected for Seed Data");
+
+    // Get a reference to the database
+    const db = client.db(dbName);
+
+    // Get a reference to the collection where the data will be stored
+    const collection = db.collection(collectionName);
+
+    // Insert the array of vehicle data objects into the collection
+    const result = await collection.insertMany(vehicleData);
+    console.log(
+      `${result.insertedCount} documents inserted into the collection`
+    );
+  } catch (error) {
+    // Handle any errors that occur during the seeding process
+    console.error("Error seeding data:", error);
+  } finally {
+    // Close the database connection, regardless of whether an error occurred
+    await client.close();
+    console.log("Disconnected from MongoDB");
+  }
+}
+// Call the seedData function to initiate the data seeding process
+seedData();
