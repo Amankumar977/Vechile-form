@@ -28,13 +28,13 @@ const Form = () => {
     if (page === 0) {
       return <PersonalDetails page={page} setPage={setPage} />;
     } else if (page === 1) {
-      return <NumberOfWheels />;
+      return <NumberOfWheels page={page} setPage={setPage} />;
     } else if (page === 2) {
-      return <VehicleType />;
+      return <VehicleType page={page} setPage={setPage} />;
     } else if (page === 3) {
-      return <VehicleModel />;
+      return <VehicleModel page={page} setPage={setPage} />;
     } else {
-      return <DatePicker />;
+      return <DatePicker page={page} setPage={setPage} />;
     }
   };
 

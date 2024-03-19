@@ -12,13 +12,7 @@ const PersonalDetails = ({ page, setPage }) => {
 
   // Function to handle form submission
   const onSubmit = (data) => {
-    console.log(data); // Log form data to console
     setPage(page + 1); // Proceed to the next page
-  };
-
-  // Handler for clicking the 'Prev' button
-  const handlePrevClick = () => {
-    setPage((prevPage) => Math.max(prevPage - 1, 0)); // Go to the previous page, ensuring it doesn't go below 0
   };
 
   return (
@@ -38,7 +32,13 @@ const PersonalDetails = ({ page, setPage }) => {
             id={"username"}
             autoComplete={"firstName"}
             className={"!text-xl"}
-            {...register("username", { required: "Username is required" })} // Register username input with validation rules
+            {...register("username", {
+              required: "Username is required",
+              maxLength: {
+                value: 20,
+                message: "first Name cannot be more than 20 characters.",
+              },
+            })} // Register username input with validation rules
           />
           {/* Display error message if username is required */}
           {errors.username && (
@@ -70,16 +70,13 @@ const PersonalDetails = ({ page, setPage }) => {
             <Button
               type={"button"}
               text={"Prev"}
-              className={`${
-                page === 0 ? "bg-gray-300 hover:bg-gray-300 " : "" // Disable Prev button if it's the first page
-              }`}
+              className={"bg-gray-300 hover:bg-gray-300"}
               disable={page === 0}
-              onClick={handlePrevClick}
             />
             {/* Next or Submit button, depending on the page */}
             <Button
               type={"submit"}
-              text={page === 5 ? "Submit" : "Next"} // Change button text to "Submit" on the last page
+              text={"Next"} // Change button text to "Submit" on the last page
             />
           </div>
         </div>
