@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
+// Define the schema for an order
 const orderSchema = new Schema(
   {
     firstName: {
@@ -39,9 +40,11 @@ const orderSchema = new Schema(
       required: [true, "vehicle Id is required"],
     },
   },
-  { timestamps: true }
+  { timestamps: true } // Automatically adds createdAt and updatedAt fields to documents
 );
 
+// Create a model based on the schema
 const Order = model("Order", orderSchema);
 
+// Export the Order model
 export default Order;
