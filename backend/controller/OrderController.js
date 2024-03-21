@@ -47,74 +47,51 @@ export async function handleGetAllVehicles(req, res) {
   }
 }
 
-// Function to handle updating vehicle dates
-export async function handleUpdateVehicleDate(req, res) {
-  let client;
-  try {
-    // Extracting required details from the request body
-    const { id, startDate, endDate } = req.body;
-
-    // Checking if all required details are provided
-    if (!id || !startDate || !endDate) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide all the required details",
-      });
-    }
-
-    // Getting the MongoDB URI from environment variables
-    const uri = process.env.MONGO_URL;
-    client = new MongoClient(uri); // Creating a new MongoDB client
-    await client.connect(); // Connecting to the MongoDB database
-
-    // Accessing the database and the collection of vehicles
-    const db = client.db();
-    const collection = db.collection("vehicles");
-
-    // Finding and updating the vehicle with the provided ID
-    const result = await collection.findOneAndUpdate(
-      { _id: new ObjectId(id) }, // Corrected instantiation of ObjectId
-      { $set: { startDate, endDate } },
-      { returnOriginal: false }
-    );
-
-    // If no vehicle is found with the provided ID, return a 404 status with an error message
-    if (!result) {
-      return res.status(404).json({
-        success: false,
-        message: "No vehicle found with the provided ID",
-      });
-    }
-
-    // If vehicle details are successfully updated, return a 200 status with the updated data
-    return res.status(200).json({
-      success: true,
-      message: "Vehicle details updated successfully",
-      data: result.value,
-    });
-  } catch (error) {
-    // If an error occurs during updating, return a 500 status with the error message
-    console.error("Error in updating the vehicle details", error);
-    return res.status(500).json({ success: false, message: error.message });
-  } finally {
-    // Closing the MongoDB client connection in the finally block
-    if (client) await client.close();
-  }
-}
-
 // Function to handle creating an order
 export async function handleCreateOrder(req, res) {
   try {
     // Extracting final order details from the request body
-    const { finalOrder } = req.body;
+    const { finalOrder, vehicleId, newOrderStartDate, newOrderEndDate } =
+      req.body;
 
     // Checking if final order details are provided
-    if (!finalOrder) {
+    if (!finalOrder || !vehicleId || !newOrderStartDate || !newOrderEndDate) {
+      // If any required detail is missing, return a 400 status with an error message
       return res.status(400).json({
         success: false,
         message: "Please provide all the required details",
       });
     }
+
+    // Check if the selected dates overlap with any existing orders for the same vehicle
+    const overLappingDates = await Order.find({
+      vehicleId: vehicleId,
+      $or: [
+        {
+          // Check if the new order starts during an existing order
+          $and: [
+            { startDate: { $gte: newOrderStartDate, $lt: newOrderEndDate } },
+            { endDate: { $gt: newOrderStartDate, $lte: newOrderEndDate } },
+          ],
+        },
+        {
+          // Check if the new order completely covers an existing order
+          $and: [
+            { startDate: { $lte: newOrderStartDate } },
+            { endDate: { $gte: newOrderEndDate } },
+          ],
+        },
+      ],
+    });
+
+    // If overlapping dates are found, return a 400 status with an appropriate message
+    if (overLappingDates.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "The selected dates are not available.",
+      });
+    }
+
     // Creating the order using the Order model
     const order = await Order.create(finalOrder);
 
@@ -125,50 +102,16 @@ export async function handleCreateOrder(req, res) {
         message: "Unable to create the order",
       });
     }
+
+    // If order creation is successful, return a 201 status with a success message
     return res.status(201).json({
       success: true,
       message: "Order created successfully",
     });
   } catch (error) {
+    // Log any errors that occur during order creation
     console.log(error.message);
     // If an error occurs during order creation, return a 500 status with an error message
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-}
-export async function handleGetAllOrders(req, res) {
-  try {
-    const { vehicleModel } = req.params;
-    if (!vehicleModel) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide the vehicle model",
-      });
-    }
-    // Fetch all orders of vehicle from the database
-    let orders = await Order.find({ vehicleModel: vehicleModel }).sort({
-      startDate: 1,
-    });
-
-    // Check if any orders are found
-    if (orders.length === 0) {
-      // If no orders are found, return a 404 status with a message
-      return res.status(404).json({
-        success: false,
-        message: "No order found",
-      });
-    }
-    // If orders are found, return a 200 status with the orders
-    return res.status(200).json({
-      success: true,
-      message: "Order fetched",
-      orders,
-    });
-  } catch (error) {
-    // If an error occurs during order fetching, log the error and return a 500 status with an error message
-    console.log("Error while getting the orders", error.message);
     return res.status(500).json({
       success: false,
       message: error.message,
